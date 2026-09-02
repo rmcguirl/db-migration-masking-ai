@@ -1,0 +1,42 @@
+# Postgres native <-> canonical type mapping (design doc §8).
+# nativeToCanonical uses the lower-case TYPE_NAME values reported by pgjdbc's
+# DatabaseMetaData.getColumns() (pg_catalog short names, e.g. "int4" not "integer").
+# canonicalToNative uses standard SQL type keywords accepted by CREATE TABLE/ALTER TABLE.
+nativeToCanonical:
+  - nativeType: varchar
+    canonical: STRING
+  - nativeType: bpchar
+    canonical: STRING
+  - nativeType: text
+    canonical: TEXT
+  - nativeType: int2
+    canonical: INTEGER
+  - nativeType: int4
+    canonical: INTEGER
+  - nativeType: int8
+    canonical: LONG
+  - nativeType: numeric
+    canonical: DECIMAL
+  - nativeType: bool
+    canonical: BOOLEAN
+  - nativeType: date
+    canonical: DATE
+  - nativeType: timestamp
+    canonical: TIMESTAMP
+  - nativeType: timestamptz
+    canonical: TIMESTAMP
+  - nativeType: bytea
+    canonical: BINARY
+  - nativeType: uuid
+    canonical: UUID
+canonicalToNative:
+  STRING: varchar
+  TEXT: text
+  INTEGER: integer
+  LONG: bigint
+  DECIMAL: numeric
+  BOOLEAN: boolean
+  DATE: date
+  TIMESTAMP: timestamp
+  BINARY: bytea
+  UUID: uuid

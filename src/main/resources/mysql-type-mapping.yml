@@ -1,0 +1,52 @@
+# MySQL native <-> canonical type mapping (design doc §8).
+# nativeToCanonical uses the lower-case TYPE_NAME values reported by MySQL Connector/J's
+# DatabaseMetaData.getColumns().
+# canonicalToNative uses type keywords accepted by MySQL's CREATE TABLE/ALTER TABLE.
+# MySQL has no native UUID type; per design doc §8, UUID pairs with char(36) for DDL
+# generation, but on introspection a plain "char" column maps back to STRING rather than
+# UUID, since a fixed-length string can't be reliably distinguished from a UUID from
+# metadata alone.
+nativeToCanonical:
+  - nativeType: varchar
+    canonical: STRING
+  - nativeType: char
+    canonical: STRING
+  - nativeType: text
+    canonical: TEXT
+  - nativeType: longtext
+    canonical: TEXT
+  - nativeType: tinyint
+    canonical: BOOLEAN
+  - nativeType: smallint
+    canonical: INTEGER
+  - nativeType: int
+    canonical: INTEGER
+  - nativeType: bigint
+    canonical: LONG
+  - nativeType: decimal
+    canonical: DECIMAL
+  - nativeType: numeric
+    canonical: DECIMAL
+  - nativeType: date
+    canonical: DATE
+  - nativeType: datetime
+    canonical: TIMESTAMP
+  - nativeType: timestamp
+    canonical: TIMESTAMP
+  - nativeType: blob
+    canonical: BINARY
+  - nativeType: varbinary
+    canonical: BINARY
+  - nativeType: binary
+    canonical: BINARY
+canonicalToNative:
+  STRING: varchar
+  TEXT: text
+  INTEGER: int
+  LONG: bigint
+  DECIMAL: decimal
+  BOOLEAN: tinyint
+  DATE: date
+  TIMESTAMP: datetime
+  BINARY: blob
+  UUID: char

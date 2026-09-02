@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Routes the console pattern through SecretRedactingMessageConverter's %maskedMsg
+  conversion word instead of the default %msg, so a value registered via
+  LogRedactionInitializer (or a key/password-shaped pattern) never reaches the console
+  even if it ends up in a log message by accident (design doc §8).
+-->
+<configuration>
+    <conversionRule conversionWord="maskedMsg"
+                     converterClass="com.migration.logging.SecretRedactingMessageConverter"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %maskedMsg%n%ex</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

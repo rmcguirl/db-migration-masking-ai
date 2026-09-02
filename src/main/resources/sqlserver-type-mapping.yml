@@ -1,0 +1,54 @@
+# SQL Server native <-> canonical type mapping (design doc §8).
+# nativeToCanonical uses the lower-case TYPE_NAME values reported by the Microsoft JDBC
+# driver's DatabaseMetaData.getColumns().
+# canonicalToNative uses type keywords accepted by SQL Server's CREATE TABLE/ALTER TABLE.
+# TEXT maps to native type "nvarchar" with no length: SqlServerSqlDialect.ddlTypeLiteral
+# renders a length-less nvarchar/varchar/varbinary as "nvarchar(max)", not a bare truncating type.
+nativeToCanonical:
+  - nativeType: nvarchar
+    canonical: STRING
+  - nativeType: varchar
+    canonical: STRING
+  - nativeType: nchar
+    canonical: STRING
+  - nativeType: char
+    canonical: STRING
+  - nativeType: text
+    canonical: TEXT
+  - nativeType: ntext
+    canonical: TEXT
+  - nativeType: int
+    canonical: INTEGER
+  - nativeType: bigint
+    canonical: LONG
+  - nativeType: smallint
+    canonical: INTEGER
+  - nativeType: decimal
+    canonical: DECIMAL
+  - nativeType: numeric
+    canonical: DECIMAL
+  - nativeType: bit
+    canonical: BOOLEAN
+  - nativeType: date
+    canonical: DATE
+  - nativeType: datetime2
+    canonical: TIMESTAMP
+  - nativeType: datetime
+    canonical: TIMESTAMP
+  - nativeType: varbinary
+    canonical: BINARY
+  - nativeType: binary
+    canonical: BINARY
+  - nativeType: uniqueidentifier
+    canonical: UUID
+canonicalToNative:
+  STRING: nvarchar
+  TEXT: nvarchar
+  INTEGER: int
+  LONG: bigint
+  DECIMAL: decimal
+  BOOLEAN: bit
+  DATE: date
+  TIMESTAMP: datetime2
+  BINARY: varbinary
+  UUID: uniqueidentifier

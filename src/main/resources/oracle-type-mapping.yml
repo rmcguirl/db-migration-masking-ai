@@ -1,0 +1,30 @@
+# Oracle native <-> canonical type mapping (design doc §8).
+# "number" is deliberately absent from nativeToCanonical: Oracle uses the single native
+# type NUMBER for INTEGER, LONG, DECIMAL, and BOOLEAN alike, distinguished only by
+# precision/scale, which this flat name-to-kind table can't express. OracleTypeMapper
+# special-cases "number" in Java on both directions instead of consulting this file.
+nativeToCanonical:
+  - nativeType: varchar2
+    canonical: STRING
+  - nativeType: nvarchar2
+    canonical: STRING
+  - nativeType: char
+    canonical: STRING
+  - nativeType: clob
+    canonical: TEXT
+  - nativeType: nclob
+    canonical: TEXT
+  - nativeType: date
+    canonical: DATE
+  - nativeType: timestamp
+    canonical: TIMESTAMP
+  - nativeType: blob
+    canonical: BINARY
+  - nativeType: raw
+    canonical: BINARY
+canonicalToNative:
+  STRING: varchar2
+  TEXT: clob
+  DATE: date
+  TIMESTAMP: timestamp
+  BINARY: blob

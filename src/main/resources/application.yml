@@ -1,0 +1,46 @@
+# Default configuration (design doc §9a). Override per-deployment via
+# --spring.config.additional-location=file:./migration.yml, or environment variables.
+# Secrets (DB credentials, the masking key) are never inlined here — they're resolved
+# from the environment at startup (${VAR} placeholders, or env:VAR for the masking key).
+migration:
+  source:
+    type: postgres
+    connection:
+      url: jdbc:postgresql://localhost:5432/source_db
+      username: ${SOURCE_DB_USER:}
+      password: ${SOURCE_DB_PASSWORD:}
+    pool:
+      maxSize: 10
+  destination:
+    type: postgres
+    connection:
+      url: jdbc:postgresql://localhost:5432/warehouse_db
+      username: ${DEST_DB_USER:}
+      password: ${DEST_DB_PASSWORD:}
+    pool:
+      maxSize: 10
+  run:
+    batchSize: 5000
+    parallelism: 4
+  overrides:
+    naturalKeys: []
+    masking: []
+    forceSensitive: []
+    virtualForeignKeys: []
+  ai:
+    enabled: true
+    provider: private-endpoint
+    confidenceThreshold: 0.85
+    allowDataSampling: false
+    sampleSize: 20
+  masking:
+    keySource: "env:MASKING_HMAC_KEY"
+    keyVersion: 1
+  referentialIntegrity:
+    cycles: []
+  controlPlane:
+    datastore: "jdbc:h2:file:./control-plane/migration-control"
+
+spring:
+  application:
+    name: db-migration-masking-ai

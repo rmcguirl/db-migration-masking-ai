@@ -1,0 +1,41 @@
+# Mongo BSON <-> canonical type mapping (design doc §8). nativeType values are the
+# BSON type labels this connector derives from each sampled Java driver value's runtime
+# type (see MongoSourceConnector#bsonTypeNameOf), not driver metadata (Mongo has none).
+# "array" and "object" (nested documents) are approximated as TEXT: the canonical type
+# system is relational-shaped and has no structured/nested kind (design doc §1's
+# non-relational-support flag already calls out that non-relational introspection is
+# inference, not fact — this is one more instance of that same limitation).
+nativeToCanonical:
+  - nativeType: string
+    canonical: STRING
+  - nativeType: objectid
+    canonical: STRING
+  - nativeType: int32
+    canonical: INTEGER
+  - nativeType: int64
+    canonical: LONG
+  - nativeType: double
+    canonical: DECIMAL
+  - nativeType: decimal128
+    canonical: DECIMAL
+  - nativeType: bool
+    canonical: BOOLEAN
+  - nativeType: date
+    canonical: TIMESTAMP
+  - nativeType: bindata
+    canonical: BINARY
+  - nativeType: array
+    canonical: TEXT
+  - nativeType: object
+    canonical: TEXT
+canonicalToNative:
+  STRING: string
+  TEXT: string
+  INTEGER: int32
+  LONG: int64
+  DECIMAL: decimal128
+  BOOLEAN: bool
+  DATE: date
+  TIMESTAMP: date
+  BINARY: bindata
+  UUID: bindata
