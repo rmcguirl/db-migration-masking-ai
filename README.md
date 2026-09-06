@@ -131,8 +131,9 @@ existing matrices.
 Java 17 · Spring Boot 3.3 (`spring-boot-starter`, `-jdbc`, `-batch`, `-validation`) ·
 Spring Batch (chunked, restartable, dependency-ordered load) · HikariCP · Flyway ·
 embedded H2 control plane (job repository, plan cache, audit log — swappable to a managed
-Postgres via config) · Jackson (YAML/JSON) · JUnit 5 + AssertJ · Testcontainers (Postgres,
-MySQL, Oracle, SQL Server, MongoDB) for connector contract tests against real engines.
+Postgres via config) · Jackson (YAML/JSON) · JUnit 5 + AssertJ · Testcontainers (Postgres
+wired up today; MySQL, Oracle, SQL Server, and MongoDB modules included in the build for
+the same pattern, contract tests pending) for connector contract tests against real engines.
 
 ## Getting started
 
@@ -161,17 +162,22 @@ and §9 of the design doc.
 
 - **Unit tests per masking technique** — determinism (same input + key → same output),
   one-wayness, format/length compliance.
-- **Connector contract tests against real engines via Testcontainers** — introspection
-  accuracy, additive-only DDL (a pre-seeded conflicting-column fixture asserts no
-  alteration occurs), and upsert idempotency (the same batch applied twice yields the same
-  destination state).
+- **Connector contract test against a real engine via Testcontainers** — currently
+  implemented for PostgreSQL (`PostgresConnectorIntegrationTest`), covering introspection
+  accuracy, additive-only DDL, and upsert idempotency (the same batch applied twice yields
+  the same destination state). The same pattern extends to MySQL, Oracle, SQL Server, and
+  MongoDB — their Testcontainers dependencies are already wired into the build — but those
+  contract tests aren't written yet.
 - **Referential-integrity tests** covering composite keys and self-referencing FKs, asserting
   masked child FK values equal masked parent PK values.
 - **Plan-generation tests** covering the AI/pattern-rule merge, confidence fallback, and
   key-column technique validation.
+- **DDL reconciliation and conflict-resolution tests** at the unit level (`JdbcDdlReconcilerTest`,
+  `DdlConflictResolverTest`), independent of the Postgres integration test above.
 
-Run `mvn test` with Docker available to exercise the full suite, including the
-Testcontainers-backed `PostgresConnectorIntegrationTest`, which spins up a real
+Run `mvn test -Dtest='!PostgresConnectorIntegrationTest'` to run everything except the
+Testcontainers-backed test without needing Docker. Run plain `mvn test` with Docker
+available to also exercise `PostgresConnectorIntegrationTest`, which spins up a real
 `postgres:16-alpine` container and validates the connector end to end.
 
 ## Project structure
